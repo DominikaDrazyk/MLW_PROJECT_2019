@@ -23,7 +23,7 @@ def create_box_plot(data,x_value,y_value,name):
 
 pd.set_option('display.max_columns', None)
 
-df = pd.read_csv('final_data_ecg.csv',sep=';')
+df = pd.read_csv('data_ecg.csv',sep=';')
 
 df['AE']=abs(df['Rd']-df['Td'])/df['Td']
 df['RATIO']=df['Rd']/df['Td']
