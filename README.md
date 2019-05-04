@@ -9,26 +9,32 @@ Here you will find procedures for:
   written in both R and Python (pandas) 
     
     https://www.r-project.org/about.html
+    
     https://pandas.pydata.org/
+    
 - basic bayesian analysis:
   written in R (rstan)
     
     https://mc-stan.org/users/interfaces/rstan
+    
 - basic eeg analysis:
   written in MATLAB (EEGlab, FieldTrip)
     
     https://sccn.ucsd.edu/wiki/EEGLAB
+    
     http://www.fieldtriptoolbox.org/documentation/
+    
 - basic machine learning analysis:
   written in Python (TensorFlow, sci-kit learn)
     
     https://www.tensorflow.org/
+    
     https://scikit-learn.org/0.20/_downloads/scikit-learn-docs.pdf
+    
   
 All procedures are annotated and ready-to-use with Jupyter Notebook / Google Colaboratory and the access to the attached databases.
 <exceptions are only those written in MATLAB concerning EEG analysis>
 Nevertheless, we encourage you to modify the source code and adjust it to your own data and ideas. 
-
 Hope you will find it useful in the best case, not too vague at the very least. 
 
 
@@ -36,6 +42,8 @@ Hope you will find it useful in the best case, not too vague at the very least.
 Sebastian Suchowiak
 Paweł Ciślik
 Dominika Drążyk 
+
+
 
 Cognitive Science
 Jagiellonian University 
