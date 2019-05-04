@@ -32,7 +32,16 @@ Here you will find procedures for:
     https://scikit-learn.org/0.20/_downloads/scikit-learn-docs.pdf
     
   
-All procedures are annotated and ready-to-use with Jupyter Notebook / Google Colaboratory and the access to the attached databases (exceptions are only those written in MATLAB concerning EEG analysis).
+All procedures are annotated and ready-to-use with:
+- Jupyter Notebook
+
+https://jupyter.org/documentation
+
+- Google Colaboratory 
+
+https://colab.research.google.com/notebooks/welcome.ipynb
+
+(exceptions are only those written in MATLAB concerning EEG analysis) and the access to the attached databases.
 Nevertheless, we encourage you to modify the source code and adjust it to your own data and ideas. 
 Hope you will find it useful in the best case, not too vague at the very least. 
 
