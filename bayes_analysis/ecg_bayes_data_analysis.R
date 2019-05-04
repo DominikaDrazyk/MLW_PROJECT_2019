@@ -1,7 +1,7 @@
 WD <- getwd()
 setwd(WD)
 
-data <- read.csv(file="final_data_ecg.csv", header = TRUE, sep = ';', dec = ",")
+data <- read.csv(file="data_ecg.csv", header = TRUE, sep = ';', dec = ",")
 
 data$Rd<-as.numeric(data$Rd)
 data$Td<-as.numeric(data$Td)
