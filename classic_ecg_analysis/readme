@@ -1,0 +1,12 @@
+ECG & SUBJECTIVE TIME ESTIMATION EXPERIMENT
+LANGUAGE : R / PYTHON
+TOOL : JUPYTER NOTEBOOK, pandas, brms package 
+ADDITIONAL INFORMATIONS: 
+
+https://www.rensvandeschoot.com/tutorials/brms-started/
+
+https://pythonfordatascience.org/anova-python/
+
+In this code we analyse dataset containing, among other variables, ECG signal coefficients. 
+The structure of the whole experiment is explained in the attached presentation. 
+
