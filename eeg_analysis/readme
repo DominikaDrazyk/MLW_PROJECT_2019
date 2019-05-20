@@ -1,1 +1,6 @@
-foo
+EEG EXPERIMENT
+LANGUAGE : PYTHON / MATLAB
+TOOL : JUPYTER NOTEBOOK, pandas / EEGLab, FieldTrip
+
+In this code we analyse EEG recordings showing mostly basic processing steps. 
+Python code provide us with the full basic analysis, MATLAB code shows how to define our own conditions for epoch definitions based on triggers. 

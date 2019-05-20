@@ -1,0 +1,427 @@
+---
+title: "R Workshop PART 1 - CCSC11 - Cracow 2019"
+output: html_notebook
+---
+R is a programming language and software environment for 
+- statistical analysis, 
+- graphics representation,
+- reporting. 
+
+My former statistics tutor claimed he hates it for being all that and free but he has also some 
+inexplicable patience to make all those thousand clicks in SPSS. Apparently there was no such patience in Ross Ihaka and Robert Gentleman (University of Auckland, New Zealand) who created the language and put it under GNU General Public.
+
+What are the reasons I use R myself? 
+- although statistics is something we shouldn't do automatically, it is good to have some ready-to-go algorithm we can modify easily. SPSS sometimes push us to just click the buttons one by one without actually thinking what are we doing, isnt it? 
+- for example, when we do the experiment with the questionaire and make a mistake when summing the points in scale, we are forced to fix our database and re-click all the procedure in SPSS. 
+- opennes of the science, R promotes it by free access to its functions and libraries. Our analysis is more shareable than the procedure of pressed buttons in SPSS.
+
+<< explain how the RStudio works >>
+
+So, let's start with some generals to get the first understanding. 
+We have six data types (vector objects):
+
+First is just a way to store boolean data:
+
+```{r}
+vo <- TRUE 
+print(class(vo))
+```
+
+... but it may be also:
+
+```{r}
+vo <- "TRUE"
+print(class(vo))
+```
+
+which carries the same result.
+We have some numeric types, mostly to store interval or ratio scale data.
+
+```{r}
+vo <- 8.8
+print(class(vo))
+```
+
+```{r}
+vo <- 2L
+print(class(vo))
+```
+
+```{r}
+vo <- 12+50i
+print(class(vo))
+```
+
+Those tools work for us carrying some data and are usually stored in some containers. 
+Those containers my be vectors...
+
+```{r}
+PhD <- c('horrible','looong',"searched")
+
+print(PhD)
+
+print(class(PhD))
+```
+
+here "c" is for "combine".
+
+... lists where we can store multiple datatypes at once ...
+
+```{r}
+the_list <- list(c(1,2,3),45.6,sin(9),"coffee break")
+
+print(the_list)
+```
+
+... two dimentional matrix, the way that for example EEG or psychopchysiological signal is stored...
+
+```{r}
+the_M = matrix( c('y','o','u','a','r','e','n','e','o'), nrow = 3, ncol = 3, byrow = TRUE)
+
+print(the_M)
+```
+
+... and an x-dimentional array, where the last component of 'dim' parameter reveals the number of dimensions...
+
+```{r}
+the_array <- array(c('kill','bill'),dim = c(3,3,2))
+
+print(the_array)
+```
+
+When we are going to analyze our data we commonly have some variables with either qualitative or quantitative values.
+
+Both we can easily declare them starting from a vector level:
+
+```{r}
+PhD <- c('horrible','looong',"searched")
+
+factor_PhD <- factor(PhD)
+
+print(factor_PhD)
+
+print(nlevels(factor_PhD))
+```
+
+Usually we do not want our data in R as freely flying vectors, factors or matrices. The better we explain their structure to R, the easier we will go after. Now we want to put them in the dataframe:
+
+```{r}
+PhD_register <- 	data.frame(
+  name = c('Darren','Tom','Anna'), 
+  factor_PhD, 
+  years = c(5, 10.5, 0), 
+  grade = c(2, 5, 0)
+  )
+
+print(PhD_register)
+```
+
+When working with the analysis, it is a very good idea to start the code with the "libraries" section, when we will add some, when needed. 
+
+<< explain the procedure of the library first instalation >>
+
+Libraries:
+
+```{r}
+library(car)
+# ...
+```
+
+Most often we have our data already in some file and we just want to load it properly. So let's start the first common task.
+
+Experiment: how the genetical modification in eye gene (exp_group 1) or control group (exp_group 0) / sex / brightness / stai / influence temporal estimation (estimated_time) of a of the picture time exposition. How the heart rate (hr) influence reaction times (RT). 
+
+<< explain how to set the working directory >>
+
+```{r}
+setwd("C:/Users/DominikaD/Desktop/CCSC_WORKSHOP")
+```
+
+We have the data in typical .csv file (or xlsx if we want):
+
+```{r}
+data <- read.csv(file="workshop_data.csv", header = TRUE, sep = ';', dec = ",")
+#data <- read.xlsx("workshop_data.csv.xlsx", sheetIndex = 1)
+```
+
+We can modify the sep and dec parameter when we notice some derogations from the common. The header set to TRUE will allow us load the first row if a file as variable's names.
+
+Let's see what we have, we can do it either form a code, or from enviroment window:
+
+```{r}
+head(data) 
+```
+
+To make sure all the columns are read in the proper form, we can enforce it, 
+I like to do it like that just to sleep calm:
+
+```{r}
+data$RT<-as.numeric(data$RT)
+data$stai<-as.numeric(data$stai)
+data$post_hr<-as.numeric(data$post_hr)
+data$trial_num<-as.numeric(data$trial_num)
+data$estimated_time<-as.numeric(data$estimated_time)
+```
+
+```{r}
+data$id <- factor(data$id)
+data$sex <- factor(data$sex)
+data$exp_group <- factor(data$exp_group)
+data$brightness <- factor(data$brightness)
+```
+
+... and check twice either in code or from enviroment window again. 
+
+We may also want to analyse only one group of the data - we just have to describe the condition of choice:
+
+```{r}
+data_women <- subset(data, data$sex == "K")
+```
+
+Z-score: number of standard deviations from the mean a data point is a measure of how many standard deviations below or above the population mean a raw score is.
+For a z-score procedure:
+
+```{r}
+data$stai_zscore <- ave(data$stai, data$id, FUN=scale)
+```
+
+As we see in the file, there are some ready-to-go variables, but some we may want to count from raw results with the aggregation procedure. 
+
+<< explain aggregation procedure >>
+
+It can be easily done.
+
+```{r}
+library(plyr)
+library(dplyr)
+
+data_agg <- ddply(data, .(id, brightness), summarize, 
+                  estimated_time.mean = mean(estimated_time, na.rm=TRUE), 
+                  estimated_time.sd = sd(estimated_time, na.rm=TRUE))
+```
+
+```{r}
+summary(data_agg)
+```
+
+In the summary we may se the most common descriptive statistics of a variable. 
+We can also show it differently:
+
+```{r}
+library(psych)
+
+describe(data_agg$estimated_time.mean)
+```
+
+What should interest us afterwards is plotting our data as histogram to see whether 
+it fits normal distribution. 
+
+Another library comes in use:
+
+<< explain the logic behind the '+' structure of ggplot and how we can smoothly create rady-to-publish plots and graphs >>
+
+```{r}
+library(gplots)
+library(ggplot2)
+
+ggplot(data,
+      aes(x=estimated_time)) + 
+      geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 3) +
+      geom_density(alpha=.15, colour="red", fill="grey") +
+      xlab('estimated time') +
+      ylab('frequency') + 
+      labs(title = "histogram") +
+      labs(caption = "... based on CCSC11 WORKSHOP data") +
+      theme(axis.title=element_text(face="bold", size="12", color="black")) +
+      theme(plot.title = element_text(face="bold", size="12", color="black")) + 
+      theme(plot.margin=margin(0.5,0.5,0.5,0.5,'cm'))
+      
+```
+
+As long as this shape does not bother us too much we may now make the 'eye-check' of our means in groups. We wil plot them with boxes:
+
+<< also a difference in storing the plot - as an object here >>
+
+```{r}
+box <- ggplot(data_agg, aes(brightness, estimated_time.mean, colour = brightness)) + 
+      geom_boxplot(notch = TRUE, notchwidth = 0.2, outlier.colour = "black", 
+                   outlier.fill = "black", outlier.shape = 1) + 
+      coord_flip() +
+      xlab('brightness') +
+      ylab('estimated time') + 
+      labs(title = "brightness ~ estimated time") +
+      theme(axis.title=element_text(face="bold", size="12", color="black")) +
+      theme(plot.title = element_text(face="bold", size="12", color="black")) + 
+      theme(plot.margin=margin(0.5,0.5,0.5,0.5,'cm'))
+plot(box)
+```
+
+Here we see three different groups and their means, so probably ANOVA would be for us the good solution. It can be done via two lines of code preceded by K-S / Shapiro normality test:
+
+```{r}
+ks.test(data_agg$estimated_time.mean, "pnorm")
+```
+
+```{r}
+shapiro.test(data_agg$estimated_time.mean)
+```
+
+I decided to resist all the basic models from this workshop on one function (lm()), but to make things clear, the number of ways you may deal with anova is big.
+
+We can describe our assumed model... here we deal with the hypothesis that the estimated time of an visual event depends on its brightness:
+
+```{r}
+model_1 = with(data_agg, lm(estimated_time.mean ~ brightness, data = data_agg))
+
+anova(model_1)
+```
+
+with the non-parametric tests if we are negative about our normal distribution:
+
+```{r}
+kruskal.test(estimated_time.mean ~ brightness, data = data_agg) 
+```
+
+Digging into the gained data, we may want to observe the effect of multiple comparissons.
+For that, the new library:
+
+```{r}
+library(multcomp)
+library(agricolae)
+
+mult_comp_1 <- glht(model_1,linfct=mcp(brightness="Tukey"))
+
+confint(mult_comp_1)
+```
+
+
+For H2, stating that not only the brightness of the picture but also a gender influence the estimated time, we will create new model with the new aggregation:
+
+```{r}
+data_agg_H2 <- ddply(data, .(id,brightness, sex), summarize, 
+                  estimated_time.mean = mean(estimated_time, na.rm=TRUE), 
+                  estimated_time.sd = sd(estimated_time, na.rm=TRUE))
+
+model_2 = with(data_agg_H2, lm(estimated_time.mean ~ sex + brightness))
+
+anova(model_2)
+```
+
+Finally for data visualisation we can develop a several charts:
+
+<< repeat the logic and explain how we can add new elements >>
+
+```{r}
+ggplot(data, aes(x=trial_num, y=RT) ) + 
+  geom_point(( aes(color=sex)), size=1) +
+  theme(axis.title=element_text(face="bold", size="12", color="black")) +
+  theme(plot.title = element_text(face="bold", size="12", color="black")) + 
+  theme(plot.margin=margin(0.5,0.5,0.5,0.5,'cm'))
+```
+
+```{r}
+ggplot(data, aes( x = estimated_time, y = RT,  color = sex )) + 
+  geom_point(size=1) +
+  geom_smooth(se = FALSE, method="lm") +
+  theme(axis.title=element_text(face="bold", size="12", color="black")) +
+  theme(plot.title = element_text(face="bold", size="12", color="black")) + 
+  theme(plot.margin=margin(0.5,0.5,0.5,0.5,'cm'))
+```
+
+```{r}
+data_agg_bar <- ddply(data, .(id, brightness, sex), summarize, 
+                  estimated_time.mean = mean(estimated_time, na.rm=TRUE), 
+                  estimated_time.sd = sd(estimated_time, na.rm=TRUE))
+
+ggplot(data_agg_bar, aes(x = sex, y = estimated_time.mean, fill = brightness)) +
+  geom_bar(stat="identity", position=position_dodge()) +
+  scale_fill_brewer(palette="Paired") +
+  theme_minimal() +
+  theme(axis.title=element_text(face="bold", size="12", color="black")) +
+  theme(plot.title = element_text(face="bold", size="12", color="black")) + 
+  theme(plot.margin=margin(0.5,0.5,0.5,0.5,'cm'))
+```
+
+What could be the good method for analysis for two groups? Let's set up a hypothesis that the estimated time of visual stimuli duration depends on the gene modification.
+Let's try for a t-test, also within the lm() function:
+
+```{r}
+data_agg_ttest <- ddply(data, .(id,exp_group), summarize, 
+                  estimated_time.mean = mean(estimated_time, na.rm=TRUE), 
+                  estimated_time.sd = sd(estimated_time, na.rm=TRUE))
+
+t.test <- lm(estimated_time.mean ~ exp_group, data=data_agg_ttest) 
+```
+
+```{r}
+summary(t.test)
+```
+
+And it's non-parametric version:
+
+```{r}
+wilcox.test(estimated_time.mean ~ exp_group, data=data_agg_ttest) 
+```
+
+For comparing two factors in ratio scale, the most common approach is regression. 
+Our hypothesis here goes as follows: 
+the heart rate of the participant is connected to its reaction time during the task.
+
+We can try regression with lm() now:
+
+```{r}
+model_r <- lm(post_hr ~ RT, data=data)
+```
+
+```{r}
+summary(model_r)
+
+model_r$coefficients
+```
+
+As you can see, the one thing that we do not gather here is beta coefficient, for that we should use an external command:
+
+```{r}
+library(lm.beta)
+
+model_r.beta <- lm.beta(model_r)
+
+print(model_r.beta)
+```
+
+There is also more elegant way to do aggregation: 
+
+<< explain the logic of tidyverse syntax and usability >>
+
+```{r} 
+data_agg <- data %>%
+  dplyr:::group_by(id,brightness) %>%
+  dplyr:::summarise(estimated_time.mean = mean(estimated_time), estimated_time.sd = sd(estimated_time))
+```
+
+Once again, what to install yourself:
+
+1. R language: https://cloud.r-project.org/
+
+2. RStudio: https://www.rstudio.com/products/rstudio/download/#download
+
+
+... and where to find some of the things we have done today:
+
+1. Useful package of packages (ggplot2, dplyr) with the documentation
+    https://www.tidyverse.org/
+    
+2. How to perform ANOVA in R, not only the way we did it today:
+    http://homepages.inf.ed.ac.uk/bwebb/statistics/ANOVA_in_R.pdf
+    
+3. How to deal with the regression in R and what we can infer from it:
+    http://r-statistics.co/Linear-Regression.html
+
+4. The idea behind aggregation/grouping by:
+    https://davetang.org/muse/2013/05/22/using-aggregate-and-apply-in-r/
+
+5. A little about the strange syntax of tidyverse:
+    https://style.tidyverse.org/pipes.html
+
+
+<< summing up what we have learned >>
